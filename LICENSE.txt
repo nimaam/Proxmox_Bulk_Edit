@@ -1,0 +1,60 @@
+MIT License
+
+Copyright (c) 2024 Proxmox Bulk VM Setting
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+================================================================================
+
+DISCLAIMER:
+
+This software directly modifies your WHMCS database. While it includes safety
+features (preview mode, change history, protected settings), you should:
+
+1. ALWAYS create database backups before making changes
+2. TEST thoroughly in a staging environment first
+3. EXPORT settings to CSV before bulk edits
+4. REVIEW change history after applying updates
+5. UNDERSTAND that improper use could affect VM provisioning
+
+The authors and contributors are not responsible for:
+- Data loss due to improper use
+- Database corruption
+- VM provisioning issues
+- Downtime or service interruptions
+- Any damages resulting from use of this software
+
+USE AT YOUR OWN RISK.
+
+It is strongly recommended to:
+- Have a qualified system administrator install and configure this addon
+- Maintain regular database backups
+- Test all changes in staging before production
+- Monitor change history for unexpected modifications
+- Keep backups of exported CSV files
+
+For support and issues, refer to the included documentation:
+- README.md - Complete documentation
+- INSTALLATION.md - Installation guide
+- QUICKSTART.md - Quick start guide
+- TESTING.md - Testing procedures
+- SUMMARY.md - Technical overview
+
+================================================================================
+

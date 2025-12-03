@@ -1,0 +1,316 @@
+================================================================================
+PROXMOX BULK VM SETTING - INSTALLATION CHECKLIST
+================================================================================
+
+Version: 1.0.0
+Date: December 2024
+
+================================================================================
+PRE-INSTALLATION
+================================================================================
+
+[ ] WHMCS 8.0+ installed and running
+[ ] PHP 8.1+ installed
+[ ] ModuleGarden Proxmox VE VPS Cloud module installed
+[ ] At least one product configured with Proxmox module
+[ ] Database backup created
+[ ] FTP/SSH access to WHMCS server
+[ ] Admin access to WHMCS
+
+================================================================================
+INSTALLATION STEPS
+================================================================================
+
+STEP 1: UPLOAD FILES
+[ ] Upload proxmox_bulk_vm_setting folder to:
+    /path/to/whmcs/modules/addons/proxmox_bulk_vm_setting/
+
+[ ] Verify file structure:
+    proxmox_bulk_vm_setting/
+    ├── proxmox_bulk_vm_setting.php
+    ├── lib/
+    │   ├── ChangeLogger.php
+    │   ├── CsvExporter.php
+    │   ├── Database.php
+    │   ├── GroupManager.php
+    │   └── ProductConfigManager.php
+    ├── README.md
+    ├── INSTALLATION.md
+    ├── QUICKSTART.md
+    ├── TESTING.md
+    └── SUMMARY.md
+
+[ ] Set file permissions (755 for dirs, 644 for files)
+[ ] Set ownership to web server user (www-data, apache, etc.)
+
+STEP 2: ACTIVATE MODULE
+[ ] Login to WHMCS Admin Area
+[ ] Go to Setup → Addon Modules
+[ ] Find "Proxmox Bulk VM Setting" in list
+[ ] Click "Activate" button
+[ ] Verify success message appears
+
+STEP 3: CONFIGURE ACCESS CONTROL
+[ ] Click "Configure" button
+[ ] Select admin roles that can access (recommend: Full Administrator only)
+[ ] Click "Save Changes"
+
+STEP 4: VERIFY DATABASE TABLES CREATED
+[ ] Check database for these tables:
+    - mod_proxmox_bulk_groups
+    - mod_proxmox_bulk_change_log
+
+[ ] Verify table structure (see INSTALLATION.md for SQL)
+
+STEP 5: ACCESS THE MODULE
+[ ] Go to Addons → Proxmox Bulk VM Setting
+[ ] Verify page loads without errors
+[ ] Should see "No groups configured yet" message
+
+================================================================================
+INITIAL CONFIGURATION
+================================================================================
+
+STEP 6: CREATE TEST GROUP
+[ ] Click "Manage Groups" button
+[ ] Fill in form:
+    Group Name: Test Group
+    Product IDs: [one product ID for testing]
+[ ] Click "Create Group"
+[ ] Verify group appears in list
+
+STEP 7: VERIFY PRODUCT HAS SETTINGS
+[ ] Run SQL query:
+    SELECT COUNT(*) FROM ProxmoxVeVpsCloud_ProductConfiguration 
+    WHERE product_id = [your_test_id] AND type = 'product';
+
+[ ] Result should be > 0 (typically 200-250)
+
+================================================================================
+TESTING
+================================================================================
+
+STEP 8: LOAD SETTINGS
+[ ] Click on your test group
+[ ] Verify settings load (200+ settings)
+[ ] Verify forbidden settings NOT visible:
+    - additionalDiskSize
+    - cores
+    - cpulimit
+    - cpuunits
+    - diskSize
+    - memory
+    - vcpus
+
+STEP 9: EXPORT SETTINGS (BACKUP)
+[ ] Click "Export Current Settings to CSV"
+[ ] Verify CSV downloads
+[ ] Open CSV and verify data looks correct
+[ ] SAVE THIS FILE as backup
+
+STEP 10: TEST CHANGE (READ-ONLY TEST)
+[ ] Find setting: userComment
+[ ] Note current value
+[ ] Change value to: TEST INSTALLATION
+[ ] Click "Preview Changes"
+[ ] Verify preview shows:
+    - Product ID
+    - Product name
+    - Setting name: userComment
+    - Old value
+    - New value: TEST INSTALLATION
+[ ] Click "Cancel" (DO NOT APPLY YET)
+
+STEP 11: TEST ACTUAL CHANGE
+[ ] Change userComment to: INSTALLATION VERIFIED
+[ ] Click "Preview Changes"
+[ ] Review preview carefully
+[ ] Click "Confirm & Apply Changes"
+[ ] Verify success message
+[ ] Note: "Updated 1 setting(s) across 1 product(s)"
+
+STEP 12: VERIFY CHANGE IN DATABASE
+[ ] Run SQL query:
+    SELECT value FROM ProxmoxVeVpsCloud_ProductConfiguration 
+    WHERE product_id = [your_test_id] AND setting = 'userComment';
+
+[ ] Verify value is: "INSTALLATION VERIFIED" (JSON-encoded)
+
+STEP 13: VERIFY CHANGE HISTORY
+[ ] Click "Change History" button
+[ ] Find your change
+[ ] Verify shows:
+    - Current date/time
+    - Your admin username
+    - Test Group
+    - Product ID
+    - Setting: userComment
+    - Old value
+    - New value: INSTALLATION VERIFIED
+
+================================================================================
+POST-INSTALLATION
+================================================================================
+
+STEP 14: CREATE PRODUCTION GROUPS
+[ ] Delete or rename test group
+[ ] Create real groups with actual product IDs
+[ ] Example groups:
+    - Windows VDS (IDs: 31,32,33,34,35)
+    - Linux VPS (IDs: 40,41,42,43)
+    - Storage Plans (IDs: 50,51,52)
+
+STEP 15: DOCUMENT YOUR SETUP
+[ ] Create document listing:
+    - Group names
+    - Product IDs in each group
+    - Purpose of each group
+    - Date created
+
+STEP 16: TRAIN OTHER ADMINISTRATORS
+[ ] Share QUICKSTART.md with other admins
+[ ] Demonstrate workflow:
+    1. Select group
+    2. Export settings (backup)
+    3. Edit values
+    4. Preview changes
+    5. Apply changes
+    6. Check change history
+
+STEP 17: SET UP BACKUP SCHEDULE
+[ ] Configure automated daily database backups
+[ ] Test backup restoration process
+[ ] Document backup location and procedure
+
+STEP 18: CONFIGURE MONITORING
+[ ] Add change history review to weekly tasks
+[ ] Monitor WHMCS activity log for errors
+[ ] Set up alerts for database issues
+
+================================================================================
+OPTIONAL: STAGING ENVIRONMENT TESTING
+================================================================================
+
+If you have a staging environment, complete full test suite:
+
+[ ] Run all tests from TESTING.md (50+ test cases)
+[ ] Test with multiple products (10+)
+[ ] Test with multiple settings (20+)
+[ ] Test concurrent admin access
+[ ] Test rollback using CSV export
+[ ] Verify performance is acceptable
+[ ] Check for any PHP errors in logs
+
+================================================================================
+PRODUCTION DEPLOYMENT CHECKLIST
+================================================================================
+
+[ ] All installation steps completed
+[ ] All testing steps completed
+[ ] Database backup confirmed working
+[ ] Test change successfully applied and verified
+[ ] Change history logging working
+[ ] CSV export working
+[ ] Access control configured
+[ ] Documentation reviewed
+[ ] Other admins trained
+[ ] Monitoring set up
+[ ] Emergency rollback procedure documented
+
+================================================================================
+EMERGENCY ROLLBACK PROCEDURE
+================================================================================
+
+If something goes wrong:
+
+1. [ ] Stop making changes immediately
+2. [ ] Review Change History to identify what was changed
+3. [ ] Use CSV export to get old values
+4. [ ] Manually restore old values using the addon
+5. [ ] Or restore database from backup if necessary
+6. [ ] Document what went wrong
+7. [ ] Fix the issue before trying again
+
+================================================================================
+SUPPORT CHECKLIST
+================================================================================
+
+If you encounter issues:
+
+[ ] Check INSTALLATION.md "Troubleshooting" section
+[ ] Check TESTING.md for similar test case
+[ ] Review WHMCS logs: /path/to/whmcs/logs/
+[ ] Review PHP error logs
+[ ] Check database for table existence
+[ ] Verify Proxmox module is working correctly
+[ ] Review Change History for clues
+[ ] Check file permissions
+[ ] Verify PHP version (8.1+)
+[ ] Verify WHMCS version (8.0+)
+
+================================================================================
+POST-INSTALLATION VERIFICATION
+================================================================================
+
+[ ] Module appears in Addons menu
+[ ] Can create/edit/delete groups
+[ ] Can load settings for a group
+[ ] Can preview changes
+[ ] Can apply changes
+[ ] Changes apply to all products in group
+[ ] Changes are logged in history
+[ ] CSV export works
+[ ] Protected settings not visible
+[ ] No PHP errors in logs
+[ ] Database tables created correctly
+[ ] Permissions set correctly
+[ ] Backups configured and tested
+
+================================================================================
+SIGN-OFF
+================================================================================
+
+Installation completed by: _______________________________
+
+Date: _______________________________
+
+WHMCS Version: _______________________________
+
+PHP Version: _______________________________
+
+Test Product ID Used: _______________________________
+
+First Group Created: _______________________________
+
+Test Change Applied: [ ] Yes [ ] No
+
+Change History Verified: [ ] Yes [ ] No
+
+CSV Export Tested: [ ] Yes [ ] No
+
+Database Backup Created: [ ] Yes [ ] No
+
+Ready for Production: [ ] Yes [ ] No
+
+Notes:
+________________________________________________________________________
+________________________________________________________________________
+________________________________________________________________________
+________________________________________________________________________
+
+================================================================================
+INSTALLATION COMPLETE!
+================================================================================
+
+Next steps:
+1. Read QUICKSTART.md for daily usage
+2. Keep README.md handy for reference
+3. Review TESTING.md for ongoing quality checks
+4. Maintain regular database backups
+5. Monitor Change History weekly
+6. Train additional administrators as needed
+
+Welcome to Proxmox Bulk VM Setting! 🚀
+
+================================================================================
+

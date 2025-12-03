@@ -1,0 +1,175 @@
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                  PROXMOX BULK VM SETTING v1.1.0                           ║
+║                        QUICK REFERENCE CARD                               ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ SUPPORTED MODULES                                                         │
+├───────────────────────────────────────────────────────────────────────────┤
+│  ✓ ProxmoxAddon                 → Table: ProxmoxAddon_ProductConfiguration│
+│  ✓ ProxmoxVeVpsCloud            → Table: ProxmoxVeVpsCloud_Product...    │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ CONFIGURATION                                                             │
+├───────────────────────────────────────────────────────────────────────────┤
+│ Setup → Addon Modules → Proxmox Bulk VM Setting → Configure              │
+│                                                                           │
+│ Select Module Type:                                                       │
+│  ○ Proxmox VE VPS Cloud (ProxmoxVeVpsCloud)      [DEFAULT]              │
+│  ○ Proxmox VE VPS (ProxmoxAddon)                                         │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ QUICK START                                                               │
+├───────────────────────────────────────────────────────────────────────────┤
+│ 1. Addons → Proxmox Bulk VM Setting                                      │
+│ 2. Manage Groups → Create Group                                          │
+│ 3. Enter: Name + Product IDs (comma-separated)                           │
+│ 4. Select group → Edit settings                                          │
+│ 5. Preview Changes → Confirm & Apply                                     │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ PROTECTED SETTINGS (Cannot Edit)                                         │
+├───────────────────────────────────────────────────────────────────────────┤
+│ COMMON (Both Modules):                                                    │
+│  • cores        • cpulimit      • cpuunits                               │
+│  • memory       • vcpus                                                   │
+│                                                                           │
+│ ProxmoxAddon ONLY:                                                        │
+│  • storageSize                                                            │
+│                                                                           │
+│ ProxmoxVeVpsCloud ONLY:                                                   │
+│  • additionalDiskSize    • diskSize                                       │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ FILE LOCATIONS                                                            │
+├───────────────────────────────────────────────────────────────────────────┤
+│ Main:   modules/addons/proxmox_bulk_vm_setting/                          │
+│ Config: Setup → Addon Modules → Configure                                │
+│ UI:     Addons → Proxmox Bulk VM Setting                                 │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ COMMON TASKS                                                              │
+├───────────────────────────────────────────────────────────────────────────┤
+│ CREATE GROUP:                                                             │
+│  Manage Groups → Add Group → Name: "Group Name"                          │
+│                              IDs: "31,32,33,34"                           │
+│                                                                           │
+│ BULK EDIT:                                                                │
+│  Select Group → Edit values → Preview → Confirm & Apply                  │
+│                                                                           │
+│ EXPORT BACKUP:                                                            │
+│  Select Group → Export Current Settings to CSV                           │
+│                                                                           │
+│ VIEW HISTORY:                                                             │
+│  Change History → See all changes with timestamps                         │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ TROUBLESHOOTING                                                           │
+├───────────────────────────────────────────────────────────────────────────┤
+│ SETTINGS NOT LOADING?                                                     │
+│  → Check correct module type selected in Configure                        │
+│  → Verify product IDs exist and are configured                            │
+│                                                                           │
+│ CHANGES NOT APPLYING?                                                     │
+│  → Clear PHP cache: opcache_reset()                                       │
+│  → Restart PHP-FPM: systemctl restart ea-php81-php-fpm                   │
+│  → Clear WHMCS cache: rm -rf templates_c/*                                │
+│                                                                           │
+│ WRONG MODULE SELECTED?                                                    │
+│  → Configure → Change module type → Save → Clear caches                   │
+│                                                                           │
+│ OBJECT/ARRAY ERROR?                                                       │
+│  → Make sure you have v1.1.0 files (check version)                        │
+│  → Re-upload lib/ProductConfigManager.php and clear cache                │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ FIELD TYPES                                                               │
+├───────────────────────────────────────────────────────────────────────────┤
+│ TOGGLE (on/off):   permission*, auto*, agent*, backup*, etc.             │
+│ DROPDOWN:          buttonSyle, detailsView, storageUnit, productType     │
+│ ARRAY:             tags, bridges, alternativeMode, serverGroup, etc.     │
+│ TEXTAREA:          description, args, userComment                         │
+│ TEXT:              Everything else (numbers, strings, paths)              │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ SAFETY CHECKLIST                                                          │
+├───────────────────────────────────────────────────────────────────────────┤
+│ BEFORE BULK EDITING:                                                      │
+│  ☐ Database backup created                                                │
+│  ☐ CSV export downloaded                                                  │
+│  ☐ Correct module type selected                                           │
+│  ☐ Test product verified                                                  │
+│                                                                           │
+│ DURING EDITING:                                                           │
+│  ☐ Preview changes reviewed                                               │
+│  ☐ Product list verified                                                  │
+│  ☐ Settings list checked                                                  │
+│  ☐ Values look correct                                                    │
+│                                                                           │
+│ AFTER APPLYING:                                                           │
+│  ☐ Success message received                                               │
+│  ☐ Change history checked                                                 │
+│  ☐ Test VM provisioning                                                   │
+│  ☐ Client area verified                                                   │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ DOCUMENTATION FILES                                                       │
+├───────────────────────────────────────────────────────────────────────────┤
+│ README.md                    - Complete feature guide                     │
+│ QUICKSTART.md                - 5-minute quick start                       │
+│ INSTALLATION.md              - Full installation guide                    │
+│ UPGRADE_TO_1.1.md            - Upgrade instructions                       │
+│ TROUBLESHOOTING.md           - Common issues & solutions                  │
+│ MODULE_DIFFERENCES.md        - ProxmoxAddon vs Cloud comparison          │
+│ VERSION_1.1.0_FINAL.md       - Release summary                           │
+│ TESTING.md                   - 50+ test cases                             │
+│ CHANGELOG.md                 - Version history                            │
+│ SUMMARY.md                   - Technical overview                         │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ UPGRADE FROM 1.0.1                                                        │
+├───────────────────────────────────────────────────────────────────────────┤
+│ 1. Backup: Database + Files                                               │
+│ 2. Upload: proxmox_bulk_vm_setting.php                                    │
+│           lib/ProductConfigManager.php                                     │
+│ 3. Configure: Setup → Addon Modules → Configure                           │
+│              Select module type → Save                                     │
+│ 4. Clear: PHP cache + PHP-FPM restart + WHMCS cache                       │
+│ 5. Test: Load groups, edit settings, apply changes                        │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ DATABASE TABLES                                                           │
+├───────────────────────────────────────────────────────────────────────────┤
+│ mod_proxmox_bulk_groups         - Group definitions                       │
+│ mod_proxmox_bulk_change_log     - Change history audit trail             │
+│ ProxmoxAddon_ProductConfiguration     - Addon product settings           │
+│ ProxmoxVeVpsCloud_ProductConfiguration - Cloud product settings          │
+└───────────────────────────────────────────────────────────────────────────┘
+
+┌───────────────────────────────────────────────────────────────────────────┐
+│ SUPPORT                                                                   │
+├───────────────────────────────────────────────────────────────────────────┤
+│ Issue?              → Check TROUBLESHOOTING.md first                       │
+│ Module selection?   → See MODULE_DIFFERENCES.md                           │
+│ Installation help?  → See INSTALLATION.md                                 │
+│ Upgrade help?       → See UPGRADE_TO_1.1.md                               │
+│ Usage questions?    → See README.md or QUICKSTART.md                      │
+└───────────────────────────────────────────────────────────────────────────┘
+
+╔═══════════════════════════════════════════════════════════════════════════╗
+║                           VERSION 1.1.0                                   ║
+║                    Released: December 2, 2024                             ║
+║                    WHMCS 8.0+ | PHP 8.1+ | MIT License                    ║
+╚═══════════════════════════════════════════════════════════════════════════╝
+
