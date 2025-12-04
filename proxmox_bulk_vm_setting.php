@@ -696,8 +696,10 @@ function renderPreviewPage($vars)
     // Confirmation form
     echo '<form method="post" action="' . $vars['modulelink'] . '&action=apply">';
     echo '<input type="hidden" name="group_id" value="' . $groupId . '" />';
-    echo '<input type="hidden" name="preview_data" value="' . htmlspecialchars(json_encode($preview)) . '" />';
-    echo '<input type="hidden" name="changes_data" value="' . htmlspecialchars(json_encode($changes)) . '" />';
+    // Use base64 encoding to prevent HTML entity conversion of quotes and backslashes
+    // Base64 strings are safe for HTML attributes and don't require quote escaping
+    echo '<input type="hidden" name="preview_data" value="' . htmlspecialchars(base64_encode(json_encode($preview)), ENT_QUOTES, 'UTF-8') . '" />';
+    echo '<input type="hidden" name="changes_data" value="' . htmlspecialchars(base64_encode(json_encode($changes)), ENT_QUOTES, 'UTF-8') . '" />';
     
     echo '<div class="form-group">';
     echo '<button type="submit" class="btn btn-success btn-lg">';
@@ -717,12 +719,26 @@ function applyChanges($vars)
 {
     $groupId = (int)($_POST['group_id'] ?? 0);
 
-    // Decode JSON data that was HTML-escaped in hidden inputs
+    // Decode base64-encoded JSON data from hidden inputs
+    // This prevents quotes and backslashes from being converted to HTML entities
     $previewRaw = $_POST['preview_data'] ?? '';
     $changesRaw = $_POST['changes_data'] ?? '';
 
-    $previewJson = html_entity_decode($previewRaw, ENT_QUOTES | ENT_HTML5);
-    $changesJson = html_entity_decode($changesRaw, ENT_QUOTES | ENT_HTML5);
+    // Decode HTML entities first (for safety), then decode base64
+    $previewB64 = html_entity_decode($previewRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    $changesB64 = html_entity_decode($changesRaw, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+    
+    // Decode from base64 to get the original JSON string (with actual quotes and backslashes)
+    $previewJson = base64_decode($previewB64, true);
+    $changesJson = base64_decode($changesB64, true);
+    
+    // If base64 decode failed, try direct decode (backward compatibility with old format)
+    if ($previewJson === false) {
+        $previewJson = $previewRaw;
+    }
+    if ($changesJson === false) {
+        $changesJson = $changesRaw;
+    }
 
     $previewData = json_decode($previewJson, true) ?: [];
     $changesData = json_decode($changesJson, true) ?: [];
