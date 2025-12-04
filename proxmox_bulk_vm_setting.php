@@ -588,6 +588,10 @@ function renderPreviewPage($vars)
         if (strpos($key, 'apply_') === 0) {
             $settingName = substr($key, 6);
             $newValue = $_POST['value_' . $settingName] ?? '';
+            
+            // Decode any HTML entities that might have been introduced (prevent &quot; from being stored)
+            $newValue = html_entity_decode($newValue, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+            
             // Encode the value to match database format
             $encodedNewValue = json_encode($newValue);
             $changes[$settingName] = $encodedNewValue;

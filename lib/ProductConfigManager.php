@@ -166,6 +166,9 @@ class ProductConfigManager
      */
     private function decodeValue(string $value): string
     {
+        // First, decode any HTML entities that might have been stored (prevent &quot; from persisting)
+        $value = html_entity_decode($value, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        
         $decoded = json_decode($value, true);
         
         // If it's an array, return JSON representation
@@ -173,12 +176,12 @@ class ProductConfigManager
             return json_encode($decoded, JSON_UNESCAPED_SLASHES);
         }
         
-        // If it's a string, return it
+        // If it's a string, return it (already decoded from HTML entities)
         if (is_string($decoded)) {
             return $decoded;
         }
         
-        // If it's null or something else, return original
+        // If it's null or something else, return original (already decoded from HTML entities)
         return $value;
     }
     
