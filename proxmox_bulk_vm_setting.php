@@ -715,9 +715,17 @@ function renderPreviewPage($vars)
  */
 function applyChanges($vars)
 {
-    $groupId = (int)$_POST['group_id'];
-    $previewData = json_decode($_POST['preview_data'], true);
-    $changesData = json_decode($_POST['changes_data'], true);
+    $groupId = (int)($_POST['group_id'] ?? 0);
+
+    // Decode JSON data that was HTML-escaped in hidden inputs
+    $previewRaw = $_POST['preview_data'] ?? '';
+    $changesRaw = $_POST['changes_data'] ?? '';
+
+    $previewJson = html_entity_decode($previewRaw, ENT_QUOTES | ENT_HTML5);
+    $changesJson = html_entity_decode($changesRaw, ENT_QUOTES | ENT_HTML5);
+
+    $previewData = json_decode($previewJson, true) ?: [];
+    $changesData = json_decode($changesJson, true) ?: [];
     
     $groupManager = new GroupManager();
     $configManager = new ProductConfigManager();
@@ -730,7 +738,7 @@ function applyChanges($vars)
         return;
     }
     
-    $productIds = array_map('trim', explode(',', $group['product_ids']));
+    $productIds = array_map('trim', explode(',', (string)$group['product_ids']));
     
     echo '<div class="proxmox-bulk-container">';
     echo '<h2>Applying Changes: ' . htmlspecialchars($group['name']) . '</h2>';
@@ -748,13 +756,13 @@ function applyChanges($vars)
                     // Pass encoded value directly (already in correct database format)
                     $configManager->updateSetting((int)$productId, $settingName, $encodedNewValue, true);
                     
-                    // Log the change
+                    // Log the change (store encoded new value)
                     $logger->logChange(
                         $groupId,
                         (int)$productId,
                         $settingName,
                         $oldValue,
-                        $newValue
+                        $encodedNewValue
                     );
                     
                     $successCount++;
@@ -1135,9 +1143,11 @@ function renderDropdownField(string $name, string $value): void
 /**
  * Get current module type from configuration
  */
-function getModuleType($vars): string
-{
-    return $vars['proxmox_module'] ?? 'cloud';
+if (!function_exists('getModuleType')) {
+    function getModuleType($vars): string
+    {
+        return $vars['proxmox_module'] ?? 'cloud';
+    }
 }
 
 /**
